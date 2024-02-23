@@ -8,6 +8,8 @@ import io.netty.util.CharsetUtil
 object NettyUtils {
   implicit class ByteArrayOps(arr: Array[Byte]) {
     def unpooled: ByteBuf = Unpooled.wrappedBuffer(arr)
+
+    def utf: String = new String(arr, CharsetUtil.UTF_8)
   }
 
   implicit class StringOps(s: String) {

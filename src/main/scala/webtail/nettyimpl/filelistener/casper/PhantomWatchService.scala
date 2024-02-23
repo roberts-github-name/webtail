@@ -1,6 +1,6 @@
-package webtail.nettydemo.filelistener.casper
+package webtail.nettyimpl.filelistener.casper
 
-import webtail.nettydemo.filelistener.{FileListener, FileWatcherService, WatcherContext}
+import webtail.nettyimpl.filelistener.{FileListener, FileWatcherService, WatcherContext}
 
 import java.io.File
 import java.lang.ref.{Cleaner, ReferenceQueue, WeakReference}

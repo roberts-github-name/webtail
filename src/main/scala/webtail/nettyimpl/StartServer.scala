@@ -8,6 +8,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.handler.logging.{LogLevel, LoggingHandler}
 import io.netty.util.concurrent.{DefaultEventExecutorGroup, GlobalEventExecutor}
 import org.apache.logging.log4j.scala.Logging
+import webtail.nettyimpl.filelistener.casper.PhantomWatchService
 
 object StartServer extends Logging {
   final val PORT = 8080
@@ -20,7 +21,7 @@ object StartServer extends Logging {
   def main(args: Array[String]): Unit = {
     val bossGroup = new NioEventLoopGroup(BOSS_THREADS)
     val childGroup = new NioEventLoopGroup(CHILD_THREADS)
-    val notifiers = new DefaultEventExecutorGroup(NOTIFY_THREADS)
+    val fileWatcherService = new PhantomWatchService
 
     try {
       val b = new ServerBootstrap()
@@ -29,7 +30,7 @@ object StartServer extends Logging {
         .group(bossGroup, childGroup)
         .channel(classOf[NioServerSocketChannel])
         .handler(new LoggingHandler(LogLevel.TRACE))
-        .childHandler(new WebtailInitializer(chunk = false, debug = true))
+        .childHandler(new WebtailInitializer(chunk = false, debug = true, fileWatcherService))
         .option(ChannelOption.SO_BACKLOG, Integer.valueOf(10))
 
       val ch = b.bind(PORT).sync().channel()

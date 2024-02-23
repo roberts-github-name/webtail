@@ -5,6 +5,7 @@ import io.netty.channel.socket.SocketChannel
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler
 import io.netty.handler.codec.http.{HttpObjectAggregator, HttpServerCodec}
 import io.netty.handler.logging.{LogLevel, LoggingHandler}
+import webtail.nettyimpl.filelistener.FileWatcherService
 
 /**
  * Initializes a channel pipeline as follows:
@@ -16,7 +17,11 @@ import io.netty.handler.logging.{LogLevel, LoggingHandler}
  *              Enable this for robustness at the cost of overhead when chunking is never used.
  * @param debug iff true, all messages after HTTP ser/deser and HTTP aggregation are logged at trace level
  */
-class WebtailInitializer(chunk: Boolean, debug: Boolean) extends ChannelInitializer[SocketChannel] {
+class WebtailInitializer(
+  chunk: Boolean,
+  debug: Boolean,
+  watchSvc: FileWatcherService) extends ChannelInitializer[SocketChannel] {
+
   override def initChannel(ch: SocketChannel): Unit = {
     // see https://github.com/netty/netty/blob/4.1/codec-http/src/main/java/io/netty/handler/codec/http/websocketx/WebSocketServerProtocolHandler.java
     // for a bare-bones example of websockets
@@ -36,6 +41,6 @@ class WebtailInitializer(chunk: Boolean, debug: Boolean) extends ChannelInitiali
     //       and has an extra handler in the chain that is just a no-op for the text messages we want
     p
       .addLast(new WebSocketServerProtocolHandler("", null, false, 1_000_000, false, true, 5000))
-//      .addLast(new WebtailHandler)
+      .addLast(new WebtailHandler(watchSvc))
   }
 }

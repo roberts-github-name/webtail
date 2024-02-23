@@ -1,4 +1,4 @@
-package webtail.nettydemo.filelistener
+package webtail.nettyimpl.filelistener
 
 /**
  * Passed as a parameter to [[FileWatcherService]]s when they respond to file changes.

@@ -47,13 +47,9 @@ object NettyWsEcho extends Logging {
       ch
         .closeFuture() // a Future that, when completed, means "the channel is closed now"
         .sync()
+    } finally {
+      workerGroup.shutdownGracefully()
+      bossGroup.shutdownGracefully()
     }
-    // gracefully: will report isShuttingDown=True until shut down, will accept tasks and reset
-    // a shutdown countdown on new tasks. Default countdown is 2 seconds.
-    // I suppose the idea is if you're submitting tasks and something shuts down in the middle,
-    // you probably want to wait a bit and retry shutting down. So schedule a count for later
-    // (default 2s)
-    workerGroup.shutdownGracefully()
-    bossGroup.shutdownGracefully()
   }
 }

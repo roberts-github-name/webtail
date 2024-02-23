@@ -1,4 +1,4 @@
-package webtail.nettydemo.filelistener.casper
+package webtail.nettyimpl.filelistener.casper
 
 import org.apache.logging.log4j.scala.Logging
 

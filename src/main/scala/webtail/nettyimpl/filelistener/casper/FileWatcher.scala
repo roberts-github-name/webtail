@@ -1,7 +1,9 @@
-package webtail.nettydemo.filelistener.casper
+package webtail.nettyimpl.filelistener.casper
 
-import webtail.nettydemo.filelistener.FileState.{DoesNotExist, Exists}
-import webtail.nettydemo.filelistener.{FileListener, FileState, WatcherContext}
+import org.apache.logging.log4j.scala.Logging
+import webtail.nettyimpl.filelistener.FileState.{DoesNotExist, Exists}
+import webtail.nettyimpl.filelistener.{FileListener, FileState, WatcherContext}
+import webtail.nettyimpl.filelistener.FileState.{DoesNotExist, Exists}
 
 import java.io.{File, FileInputStream}
 import java.nio.file.{Files, Path}
@@ -27,7 +29,7 @@ import scala.ref.WeakReference
  * in a specified queue can be used as a roundabout callback for fine-grained cleanup.
  * [[PhantomWatchService]] leverages this to remove this watcher from its watchers map.
  */
-class FileWatcher(file: File, exec: ScheduledExecutorService) extends Runnable {
+class FileWatcher(file: File, exec: ScheduledExecutorService) extends Runnable with Logging {
   private val listeners = mutable.Set.empty[FileListener] // subject to concurrent modifications
 
   // ctx and oldState are NOT intended to be concurrently modified; a watcher is intended to
@@ -71,22 +73,30 @@ class FileWatcher(file: File, exec: ScheduledExecutorService) extends Runnable {
       }
 
       if (listeners.nonEmpty) exec.schedule(this, 1, TimeUnit.SECONDS)
-      else {
-        println(s"Watcher $this is done, no more listeners.")
-        done = true
-      }
+      else done = true
     }
 
     oldState = newState // we don't expect concurrent modifications so we set outside the synchronized block
 
     val nanos = System.nanoTime() - start
-    println(s"$file: latest poll took $nanos nanos")
   }
 
   private def buildNotifyMethod(s1: FileState, s2: FileState): (FileListener, WatcherContext) => Unit = {
     (s1, s2) match {
       case (DoesNotExist, DoesNotExist) => null
-      case (DoesNotExist, _: Exists) => (l, c) => l.onCreate(file, c)
+      case (DoesNotExist, exists: Exists) => (l, c) => {
+        var fis: FileInputStream = null
+        try {
+          fis = new FileInputStream(file)
+          fis.getChannel.position(0L)
+          val bytes = fis.readNBytes(exists.length.toInt)
+          l.onCreate(file, bytes, c)
+        } catch {
+          case e: Exception => logger.error(s"$l: onCreate", e)
+        } finally {
+          if (fis != null) fis.close()
+        }
+      }
       case (_: Exists, DoesNotExist) => (l, c) => l.onDelete(file, c)
       case (o: Exists, n: Exists) =>
         val fns = mutable.ArrayBuffer.empty[(FileListener, WatcherContext) => Unit]

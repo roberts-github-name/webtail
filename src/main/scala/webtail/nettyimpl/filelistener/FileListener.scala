@@ -1,4 +1,4 @@
-package webtail.nettydemo.filelistener
+package webtail.nettyimpl.filelistener
 
 import java.io.File
 import java.time.Instant
@@ -10,7 +10,7 @@ import java.time.Instant
  * Listeners are registered with a watcher.
  */
 trait FileListener {
-  def onCreate(file: File, ctx: WatcherContext): Unit
+  def onCreate(file: File, newBytes: Array[Byte], ctx: WatcherContext): Unit
 
   def onAccess(file: File, prevTime: Instant, thisTime: Instant, ctx: WatcherContext): Unit
 

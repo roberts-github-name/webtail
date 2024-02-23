@@ -23,4 +23,6 @@ libraryDependencies ++= List(
   log4j %% "log4j-api-scala" % "13.0.0",
   log4j % "log4j-slf4j-impl" % log4jVersion, // log4j2 binding for slf4j 1.X
   log4j % "log4j-slf4j2-impl" % log4jVersion, // log4j2 binding for slf4j 2.X
+  "commons-io" % "commons-io" % "2.15.1",
+
 )

@@ -1,7 +1,7 @@
-package webtail.nettydemo.filelistener.casper
+package webtail.nettyimpl.filelistener.casper
 
 import io.netty.util.CharsetUtil
-import webtail.nettydemo.filelistener.{FileListener, WatcherContext}
+import webtail.nettyimpl.filelistener.{FileListener, WatcherContext}
 
 import java.io.{File, FileWriter, PrintWriter}
 import java.lang.ref.{Cleaner, PhantomReference, Reference, ReferenceQueue, WeakReference}
@@ -19,7 +19,7 @@ object Demo {
     file.deleteOnExit()
 
     val l = new FileListener {
-      override def onCreate(file: File, ctx: WatcherContext): Unit = println(s"$file created")
+      override def onCreate(file: File, newBytes: Array[Byte], ctx: WatcherContext): Unit = println(s"$file created. Contents: ${new String(newBytes)}")
       override def onAccess(file: File, prevTime: Instant, thisTime: Instant, ctx: WatcherContext): Unit = println(s"$file accessed at $thisTime")
       override def onModify(file: File, prevTime: Instant, thisTime: Instant, ctx: WatcherContext): Unit = println(s"$file modified at $thisTime")
       override def onGrow(file: File, newBytes: Array[Byte], ctx: WatcherContext): Unit = println(s"$file had this added: ${new String(newBytes, CharsetUtil.UTF_8)}")
@@ -31,7 +31,7 @@ object Demo {
     }
 
     val l2 = new FileListener {
-      override def onCreate(file: File, ctx: WatcherContext): Unit = ()
+      override def onCreate(file: File, newBytes: Array[Byte], ctx: WatcherContext): Unit = ()
       override def onAccess(file: File, prevTime: Instant, thisTime: Instant, ctx: WatcherContext): Unit = ()
       override def onModify(file: File, prevTime: Instant, thisTime: Instant, ctx: WatcherContext): Unit = ()
       override def onGrow(file: File, newBytes: Array[Byte], ctx: WatcherContext): Unit = ()
