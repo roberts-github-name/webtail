@@ -1,4 +1,4 @@
-package webtail
+package webtail.utils
 
 import io.netty.buffer.{ByteBuf, Unpooled}
 import io.netty.handler.codec.http.websocketx.{TextWebSocketFrame, WebSocketFrame}

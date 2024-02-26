@@ -2,7 +2,7 @@ package webtail.nettyimpl
 
 import io.netty.channel.ChannelHandlerContext
 import io.netty.util.CharsetUtil
-import webtail.NettyUtils.StringOps
+import webtail.utils.NettyUtils.StringOps
 import webtail.nettyimpl.filelistener.{FileListener, FileListenerAdapter, WatcherContext}
 
 import java.io.File

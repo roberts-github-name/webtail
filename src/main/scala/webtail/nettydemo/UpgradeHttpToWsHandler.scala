@@ -7,7 +7,7 @@ import io.netty.handler.codec.http.{DefaultFullHttpResponse, DefaultHttpResponse
 import io.netty.util.CharsetUtil
 import org.apache.logging.log4j.scala.Logging
 import io.netty.handler.codec.http.websocketx.WebSocketFrame
-import webtail.NettyUtils.{ByteArrayOps, StringOps}
+import webtail.utils.NettyUtils.{ByteArrayOps, StringOps}
 
 import java.net.http.HttpHeaders
 import scala.jdk.CollectionConverters.{CollectionHasAsScala, IteratorHasAsScala, MapHasAsScala}

@@ -3,7 +3,7 @@ package webtail.nettyimpl
 import io.netty.channel.{ChannelHandlerContext, SimpleChannelInboundHandler}
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame
 import org.apache.commons.io.input.ReversedLinesFileReader
-import webtail.NettyUtils.StringOps
+import webtail.utils.NettyUtils.StringOps
 import webtail.nettyimpl.filelistener.{FileListener, FileWatcherService}
 
 import java.io.{File, FileReader}
