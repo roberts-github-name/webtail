@@ -4,6 +4,7 @@ import org.apache.logging.log4j.scala.Logging
 import webtail.nettyimpl.filelistener.FileState.{DoesNotExist, Exists}
 import webtail.nettyimpl.filelistener.{FileListener, FileState, WatcherContext}
 import webtail.nettyimpl.filelistener.FileState.{DoesNotExist, Exists}
+import webtail.utils.FnUtils.TwoArgs
 
 import java.io.{File, FileInputStream}
 import java.nio.file.{Files, Path}
@@ -119,19 +120,7 @@ class FileWatcher(file: File, exec: ScheduledExecutorService) extends Runnable w
         else if (n.length < o.length) fns += { (l, c) => l.onShrink(file, o.length, n.length, c) }
 
         if (fns.isEmpty) null
-        else {
-          (l, c) => {
-            var i = 0
-            while (!c.unsubscribed && i < fns.length) {
-              try {
-                fns(i)(l, c)
-              } catch {
-                case _: Exception => c.unsubscribe()
-              }
-              i += 1
-            }
-          }
-        }
+        else fns.head.composeCond((_, c) => !c.unsubscribed, fns.tail.toSeq : _*)
     }
   }
 }
