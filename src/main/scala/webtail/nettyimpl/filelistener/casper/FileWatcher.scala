@@ -29,6 +29,26 @@ import scala.ref.WeakReference
  * If all other references are weak or phantom, then Java's placement of phantom references
  * in a specified queue can be used as a roundabout callback for fine-grained cleanup.
  * [[PhantomWatchService]] leverages this to remove this watcher from its watchers map.
+ *
+ * Callbacks on all listeners are serialized such that, if a listener is registered
+ * for only one file, all callbacks for that file are chained.
+ *
+ * TODO: ideally we'd put operations into chains of Futures for each listener
+ *       but the problem I wound up with is this:
+ *          > suppose we chain a bunch of updates to a slow listener, e.g. with 100 seconds of work
+ *          > but the channel or other entity unsubscribes the listener after 20 seconds
+ *          > then operations to commence after the 20 second point will continue to be called
+ *            even though we unsubscribed
+ *       Maybe the cardinal sin is "async unsubscribe;" perhaps an object should represent the
+ *       state of said subscription
+ *          Subscription
+ *              Listener
+ *              Future[WatcherContext]
+ *              val done: False
+ *
+ *              add callback: sync on done, if not done then chain the future
+ *              futures: chain on WatcherContext, AND check `done` to make sure we
+ *              don't "zombie-continue"
  */
 class FileWatcher(file: File, exec: ScheduledExecutorService) extends Runnable with Logging {
   private val listeners = mutable.Set.empty[FileListener] // subject to concurrent modifications
